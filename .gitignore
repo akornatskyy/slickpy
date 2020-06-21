@@ -1,0 +1,11 @@
+build/
+dist/
+env/
+src/*.egg-info/
+__pycache__/
+.idea
+.vscode
+.coverage
+.tox
+*.pyc
+*.pyo
