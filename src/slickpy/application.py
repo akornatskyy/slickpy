@@ -28,10 +28,10 @@ class App(object):
     def __init__(self) -> None:
         self.router = Router()
         self.lifespan = Lifespan()
-        self.middleware: ASGICallable = RoutingMiddleware(self.router)
+        self.entry: ASGICallable = RoutingMiddleware(self.router)
 
-    def use(self, middleware: Middleware) -> None:
-        self.middleware = middleware(self.middleware)
+    def middleware(self, m: Middleware) -> None:
+        self.entry = m(self.entry)
 
     def route(
         self,
@@ -64,7 +64,7 @@ class App(object):
         if scope["type"] == "lifespan":
             await self.lifespan(scope, receive, send)
         else:
-            await self.middleware(scope, receive, send)
+            await self.entry(scope, receive, send)
 
 
 # region: internal details

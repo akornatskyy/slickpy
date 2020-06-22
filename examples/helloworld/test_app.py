@@ -12,5 +12,5 @@ class AppTestCase(unittest.TestCase):
     def test_adapters(self):
         res = self.client.go("/")
 
-        self.assertEquals(res.status_code, 200)
-        self.assertEquals(res.text, "Hello, world!")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.text, "Hello, world!")

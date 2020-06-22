@@ -49,6 +49,8 @@ class Lifespan(object):
                 self.logger.info(event_complete)
             except Exception as ex:
                 # TODO: logging
-                await send({"type": event + ".failed", "message": str(ex)})
+                event_failed = event + ".failed"
+                await self.notify(event_failed)
+                await send({"type": event_failed, "message": str(ex)})
             else:
                 await send({"type": event_complete})

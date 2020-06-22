@@ -40,11 +40,13 @@ def route(
     *,
     methods: HTTPMethods = ("GET", "HEAD"),
 ) -> RouteResult:
-    for adapter in pattern_adapters:
-        r = adapter(pattern, handler, methods)
+    for pattern_adapter in pattern_adapters:
+        r = pattern_adapter(pattern, handler, methods)
         if r:
             return r
-    else:
+    else:  # pragma: nocover
+        # unreachable code since regex route unconditionally returns
+        # a compiled patter or fails to compile
         raise AssertionError(f"unable to find adapter for pattern '{pattern}'")
 
 
