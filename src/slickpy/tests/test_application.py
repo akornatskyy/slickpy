@@ -1,5 +1,4 @@
 import asyncio
-import typing
 import unittest
 
 from slickpy import App, Request, Writer
@@ -57,8 +56,18 @@ async def no_request() -> BinaryResponse:
     return BinaryResponse(b"Hello, world!")
 
 
+@app.route("/no-request-ret-asgi")
+async def no_request_ret_asgi() -> ASGICallable:
+    return BinaryResponse(b"Hello, world!")
+
+
 @app.route("/with-request")
 async def with_request(req: Request) -> TextResponse:
+    return TextResponse("Hello, world!")
+
+
+@app.route("/with-request-ret-asgi")
+async def with_request_ret_asgi(req: Request) -> ASGICallable:
     return TextResponse("Hello, world!")
 
 
@@ -76,15 +85,19 @@ async def status(w: Writer) -> None:
     await w.end()
 
 
+client = ASGIClient(app.asgi())
+
+
 class AppTestCase(unittest.TestCase):
     def test_adapters(self) -> None:
-        client = ASGIClient(app)
         for path in [
             "/asgi",
             "/writer",
             "/writer-request",
             "/no-request",
+            "/no-request-ret-asgi",
             "https://localhost/with-request",
+            "/with-request-ret-asgi",
             "/stream",
         ]:
             res = client.go(path)
@@ -93,7 +106,6 @@ class AppTestCase(unittest.TestCase):
             self.assertEqual(res.text, "Hello, world!")
 
     def test_status(self) -> None:
-        client = ASGIClient(app)
         res = client.go("/status")
 
         self.assertEqual(res.status_code, 201)
@@ -112,7 +124,9 @@ class AppTestCase(unittest.TestCase):
             sent_events.append(m["type"])
 
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(app({"type": "lifespan"}, receive, send))
+        loop.run_until_complete(
+            app.asgi()({"type": "lifespan"}, receive, send)
+        )
 
         self.assertEqual(
             events,
@@ -147,7 +161,7 @@ class AppTestCase(unittest.TestCase):
         async def root() -> TextResponse:
             return TextResponse("root")
 
-        client = ASGIClient(main)
+        client = ASGIClient(main.asgi())
         res = client.go()
 
         self.assertEqual(res.text, "root")
@@ -160,12 +174,10 @@ class AppTestCase(unittest.TestCase):
         main = App()
         self.assertRaises(AssertionError, lambda: main.route("/")(root))
 
-        not_callable = typing.cast(
-            typing.Callable[[], typing.Awaitable[None]], 1
-        )
-        self.assertRaises(
-            AssertionError, lambda: main.route("/")(not_callable)
-        )
+        async def unknown() -> None:
+            pass  # pragma: nocover
+
+        self.assertRaises(AssertionError, lambda: main.route("/")(unknown))
 
     def test_lifespan_event_fails(self) -> None:
         main = App()
@@ -192,7 +204,9 @@ class AppTestCase(unittest.TestCase):
             sent_events.append(m["type"])
 
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(main({"type": "lifespan"}, receive, send))
+        loop.run_until_complete(
+            main.asgi()({"type": "lifespan"}, receive, send)
+        )
 
         self.assertEqual(dispatched_events, ["shutdown", "shutdown.failed"])
         self.assertEqual(sent_events, ["lifespan.shutdown.failed"])

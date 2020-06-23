@@ -8,4 +8,5 @@ async def welcome(w: Writer) -> None:
     await w.end(b"Hello, world!")
 
 
-# uvicorn --app-dir examples/helloworld app:app
+# uvicorn --app-dir examples/helloworld app:main
+main = app.asgi()

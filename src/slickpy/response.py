@@ -59,9 +59,7 @@ class Writer(object):
                     "headers": self.headers,
                 }
             )
-        await self._send(
-            {"type": "http.response.body", "body": chunk, "more_body": False}
-        )
+        await self._send({"type": "http.response.body", "body": chunk})
 
 
 class Response(metaclass=abc.ABCMeta):

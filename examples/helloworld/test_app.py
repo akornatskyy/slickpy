@@ -2,12 +2,12 @@ import unittest
 
 from slickpy.functional import ASGIClient
 
-from app import app  # noqa: I100
+from app import main  # noqa: I100
 
 
 class AppTestCase(unittest.TestCase):
     def setUp(self):
-        self.client = ASGIClient(app)
+        self.client = ASGIClient(main)
 
     def test_adapters(self):
         res = self.client.go("/")

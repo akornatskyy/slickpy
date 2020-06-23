@@ -41,9 +41,10 @@ setup(
     ],
     keywords="",
     packages=["slickpy", "slickpy.middleware"],
+    package_data={"slickpy": ["py.typed"]},
     package_dir={"": "src"},
     zip_safe=True,
     install_requires=[],
-    extras_require={"dev": ["mock", "pytest", "pytest-pep8", "pytest-cov"]},
+    extras_require={"dev": ["pytest", "pytest-pep8", "pytest-cov"]},
     platforms="any",
 )
