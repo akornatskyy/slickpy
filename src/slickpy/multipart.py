@@ -1,10 +1,10 @@
 import typing
-from asyncio import get_running_loop
 from tempfile import SpooledTemporaryFile
 
 from multipart import MultipartParser  # type: ignore[import]
 from multipart.multipart import parse_options_header  # type: ignore[import]
 
+from slickpy.comp import get_running_loop
 from slickpy.typing import FormParams, MultipartFile, MultipartFiles
 
 

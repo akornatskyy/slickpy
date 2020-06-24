@@ -1,6 +1,7 @@
+import types
 import typing
-from asyncio import get_running_loop
-from types import TracebackType
+
+from slickpy.comp import get_running_loop
 
 T = typing.TypeVar("T")
 
@@ -166,7 +167,7 @@ class MultipartFile(object):
         self,
         exc_type: typing.Optional[typing.Type[BaseException]],
         exc_value: typing.Optional[BaseException],
-        traceback: typing.Optional[TracebackType],
+        traceback: typing.Optional[types.TracebackType],
     ) -> None:
         await self.close()
 
@@ -195,7 +196,7 @@ class MultipartFiles(Params[MultipartFile]):
         self,
         exc_type: typing.Optional[typing.Type[BaseException]],
         exc_value: typing.Optional[BaseException],
-        traceback: typing.Optional[TracebackType],
+        traceback: typing.Optional[types.TracebackType],
     ) -> None:
         await self.close()
 
