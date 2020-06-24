@@ -27,12 +27,15 @@ app = App()
 @app.route("/")
 async def welcome(w: Writer) -> None:
     await w.end(b"Hello, world!")
+
+
+main = app.asgi()
 ```
 
 Then run the example with [uvicorn](https://github.com/encode/uvicorn):
 
 ```sh
-uvicorn example:app
+uvicorn example:main
 ```
 
 See [examples](https://github.com/akornatskyy/slickpy/tree/master/examples) for more.
