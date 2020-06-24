@@ -44,7 +44,7 @@ setup(
     package_data={"slickpy": ["py.typed"]},
     package_dir={"": "src"},
     zip_safe=True,
-    install_requires=[],
+    install_requires=["python-multipart==0.0.5"],
     extras_require={"dev": ["pytest", "pytest-pep8", "pytest-cov"]},
     platforms="any",
 )

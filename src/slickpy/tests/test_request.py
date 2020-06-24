@@ -26,18 +26,8 @@ class RequestTestCase(unittest.TestCase):
             },
             noop_receive,
         )
-        self.assertEqual(len(req.query_params), 1)
-        self.assertEqual(list(req.query_params), ["msg"])
         self.assertTrue("msg" in req.query_params)
         self.assertFalse("x" in req.query_params)
-        self.assertEqual(req.query_params["msg"], "привіт")
-        self.assertEqual(req.query_params.get("msg"), "привіт")
-        self.assertEqual(req.query_params["x"], "")
-        self.assertEqual(req.query_params.get("x"), None)
-        self.assertEqual(req.query_params.get("x", "default"), "default")
-        self.assertEqual(req.query_params.get("x", ""), "")
-        self.assertEqual(req.query_params.getlist("msg"), ["hello", "привіт"])
-        self.assertEqual(req.query_params.getlist("x"), [])
 
     def test_headers(self) -> None:
         req = Request({"headers": [(b"host", b"localhost")]}, noop_receive)
@@ -118,3 +108,100 @@ class RequestTestCase(unittest.TestCase):
         self.assertRaises(
             NotImplementedError, lambda: loop.run_until_complete(req.body())
         )
+
+    def test_form_no_content_type(self) -> None:
+        req = Request({"headers": []}, noop_receive,)
+
+        loop = asyncio.get_event_loop()
+        form = loop.run_until_complete(req.form())
+        self.assertEqual(len(form), 0)
+        files = loop.run_until_complete(req.files())
+        self.assertEqual(len(files), 0)
+
+    def test_form_unknown_content_type(self) -> None:
+        req = Request(
+            {"headers": [(b"content-type", b"unknown")]}, noop_receive,
+        )
+
+        loop = asyncio.get_event_loop()
+        form = loop.run_until_complete(req.form())
+        self.assertEqual(len(form), 0)
+        files = loop.run_until_complete(req.files())
+        self.assertEqual(len(files), 0)
+
+    def test_form_urlencoded(self) -> None:
+        async def receive() -> Message:
+            return {
+                "type": "http.request",
+                "body": b"msg=hello",
+            }
+
+        req = Request(
+            {
+                "headers": [
+                    (b"content-type", b"application/x-www-form-urlencoded")
+                ]
+            },
+            receive,
+        )
+
+        loop = asyncio.get_event_loop()
+        form = loop.run_until_complete(req.form())
+        self.assertEqual(len(form), 1)
+        self.assertEqual(form.msg, "hello")
+        files = loop.run_until_complete(req.files())
+        self.assertEqual(len(files), 0)
+
+    def test_form_multipart(self) -> None:
+        async def receive() -> Message:
+            return {
+                "type": "http.request",
+                "body": b"-----123\r\n"
+                b'Content-Disposition: form-data; name="msg"\r\n\r\n'
+                b"hello\r\n"
+                b"-----123--",
+            }
+
+        req = Request(
+            {
+                "headers": [
+                    (b"content-type", b"multipart/form-data; boundary=---123")
+                ]
+            },
+            receive,
+        )
+
+        loop = asyncio.get_event_loop()
+        form = loop.run_until_complete(req.form())
+        self.assertEqual(len(form), 1)
+        self.assertEqual(form.msg, "hello")
+        files = loop.run_until_complete(req.files())
+        self.assertEqual(len(files), 0)
+
+    def test_files_multipart(self) -> None:
+        async def receive() -> Message:
+            return {
+                "type": "http.request",
+                "body": b"-----123\r\n"
+                b"Content-Disposition: form-data; "
+                b'name="secret-foo"; filename="foo.txt"\r\n'
+                b"Content-Type: text/plain\r\n\r\n"
+                b"(content of "
+                b"the uploaded file foo.txt)\r\n"
+                b"-----123--",
+            }
+
+        req = Request(
+            {
+                "headers": [
+                    (b"content-type", b"multipart/form-data; boundary=---123")
+                ]
+            },
+            receive,
+        )
+
+        loop = asyncio.get_event_loop()
+        files = loop.run_until_complete(req.files())
+        self.assertEqual(len(files), 1)
+        form = loop.run_until_complete(req.form())
+        self.assertEqual(len(form), 0)

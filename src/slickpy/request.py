@@ -1,55 +1,26 @@
 import typing
 from urllib.parse import parse_qsl
 
-from slickpy.typing import Receive, Scope
-
-
-class QueryParams(typing.Mapping[str, str]):
-    __slots__ = ("_d",)
-
-    def __init__(self, qs: bytes) -> None:
-        qsl = parse_qsl(qs.decode("latin-1"))
-        d: typing.MutableMapping[str, typing.List[str]] = {}
-        for key, value in qsl:
-            if key in d:
-                d[key].append(value)
-            else:
-                d[key] = [value]
-        self._d = d
-
-    def __getitem__(self, key: str) -> str:
-        if key in self._d:
-            return self._d[key][-1]
-        return ""
-
-    def __len__(self) -> int:
-        return len(self._d)
-
-    def __iter__(self) -> typing.Iterator[str]:
-        return iter(self._d.keys())
-
-    def __contains__(self, key: typing.Any) -> bool:
-        return key in self._d
-
-    def get(self, key: typing.Any, default: typing.Any = None) -> typing.Any:
-        if key in self._d:
-            return self._d[key][-1]
-        return default
-
-    def getlist(self, key: str) -> typing.List[str]:
-        if key in self._d:
-            return self._d[key]
-        return []
+from slickpy.multipart import parse_multipart
+from slickpy.typing import (
+    FormParams,
+    MultipartFiles,
+    QueryParams,
+    Receive,
+    Scope,
+)
 
 
 class Request(object):
     __slots__ = (
         "scope",
-        "_receive",
+        "_body",
+        "_cookies",
+        "_files",
+        "_form",
         "_headers",
         "_query_params",
-        "_cookies",
-        "_body",
+        "_receive",
     )
 
     def __init__(self, scope: Scope, receive: Receive):
@@ -58,16 +29,17 @@ class Request(object):
 
     @property
     def method(self) -> str:
-        return self.scope["method"]  # type: ignore
+        return self.scope["method"]  # type: ignore[no-any-return]
 
     @property
     def route_params(self) -> typing.Mapping[str, str]:
-        return self.scope["route_params"]  # type: ignore
+        return self.scope["route_params"]  # type: ignore[no-any-return]
 
     @property
     def query_params(self) -> QueryParams:
         if not hasattr(self, "_query_params"):
-            self._query_params = QueryParams(self.scope["query_string"])
+            pairs = parse_qsl(self.scope["query_string"].decode("latin-1"))
+            self._query_params = QueryParams(pairs)
         return self._query_params
 
     @property
@@ -83,7 +55,7 @@ class Request(object):
             if cookie:
                 self._cookies: typing.Mapping[str, str] = dict(
                     [
-                        pair.split("=", 1)  # type: ignore
+                        pair.split("=", 1)  # type: ignore[misc]
                         for pair in cookie.decode("latin-1").split("; ")
                     ]
                 )
@@ -111,3 +83,32 @@ class Request(object):
         if not hasattr(self, "_body"):
             self._body = b"".join([chunk async for chunk in self.chunks()])
         return self._body
+
+    async def form(self) -> FormParams:
+        if not hasattr(self, "_form"):
+            content_type = self.headers.get(b"content-type", b"")
+            if b"/x" in content_type:
+                pairs = parse_qsl((await self.body()).decode("utf-8"))
+                self._form = FormParams(pairs)
+            elif b"/f" in content_type:
+                form, files = await parse_multipart(
+                    content_type, self.chunks()
+                )
+                self._form = form
+                self._files = files
+            else:
+                self._form = FormParams([])
+        return self._form
+
+    async def files(self) -> MultipartFiles:
+        if not hasattr(self, "_files"):
+            content_type = self.headers.get(b"content-type", b"")
+            if b"/f" in content_type:
+                form, files = await parse_multipart(
+                    content_type, self.chunks()
+                )
+                self._form = form
+                self._files = files
+            else:
+                self._files = MultipartFiles([])
+        return self._files
