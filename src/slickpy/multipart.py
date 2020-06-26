@@ -1,15 +1,17 @@
 import typing
 from tempfile import SpooledTemporaryFile
 
-from multipart import MultipartParser  # type: ignore[import]
-from multipart.multipart import parse_options_header  # type: ignore[import]
+try:
+    from multipart.multipart import MultipartParser  # type: ignore[import]
+    from multipart.multipart import parse_options_header
+except ImportError:  # pragma: nocover
+    parse_options_header = None
 
 from slickpy.comp import get_running_loop
 from slickpy.typing import FormParams, MultipartFile, MultipartFiles
 
 
 class MultipartFileWriter(object):
-    # roll_size = 1
     roll_size = 1024 * 1024
 
     def __init__(self, name: str, content_type: str) -> None:
@@ -38,6 +40,9 @@ Operations = typing.List[
 async def parse_multipart(  # noqa: C901
     content_type_header: bytes, chunks: typing.AsyncIterator[bytes]
 ) -> typing.Tuple[FormParams, MultipartFiles]:
+    assert (
+        parse_options_header is not None
+    ), "The 'python-multipart' package must be installed."
     content_type, params = parse_options_header(content_type_header)
     header_field = b""
     header_value = b""
