@@ -1,6 +1,11 @@
 import typing
 from urllib.parse import parse_qsl
 
+try:
+    from ujson import loads as ujson_loads
+except ImportError:  # pragma: nocover
+    ujson_loads = None  # type: ignore[assignment]
+
 from slickpy.multipart import parse_multipart
 from slickpy.typing import (
     FormParams,
@@ -19,6 +24,7 @@ class Request(object):
         "_files",
         "_form",
         "_headers",
+        "_json",
         "_query_params",
         "_receive",
     )
@@ -112,3 +118,11 @@ class Request(object):
             else:
                 self._files = MultipartFiles([])
         return self._files
+
+    async def json(self) -> typing.Any:
+        if not hasattr(self, "_json"):
+            assert (
+                ujson_loads is not None
+            ), "The 'ujson' package must be installed."
+            self._json = ujson_loads(await self.body())
+        return self._json

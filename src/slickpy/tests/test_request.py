@@ -205,3 +205,17 @@ class RequestTestCase(unittest.TestCase):
         self.assertEqual(len(files), 1)
         form = loop.run_until_complete(req.form())
         self.assertEqual(len(form), 0)
+
+    def test_json(self) -> None:
+        async def receive() -> Message:
+            return {
+                "type": "http.request",
+                "body": b'{"msg":"hello"}',
+            }
+
+        req = Request({}, receive,)
+
+        loop = asyncio.get_event_loop()
+        data = loop.run_until_complete(req.json())
+
+        self.assertEqual(data, {"msg": "hello"})

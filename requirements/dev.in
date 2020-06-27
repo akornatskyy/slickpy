@@ -1,4 +1,5 @@
 python-multipart
+ujson
 
 pip-tools
 pytest
