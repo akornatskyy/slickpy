@@ -4,7 +4,13 @@ import typing
 from slickpy.lifespan import Lifespan
 from slickpy.middleware.routing import RoutingMiddleware
 from slickpy.request import Request
-from slickpy.response import BinaryResponse, Response, TextResponse, Writer
+from slickpy.response import (
+    BinaryResponse,
+    JSONResponse,
+    Response,
+    TextResponse,
+    Writer,
+)
 from slickpy.router import Router
 from slickpy.typing import (
     ASGIAdapter,
@@ -158,7 +164,7 @@ def strict_stream_signatures() -> typing.List[
     ]
 
 
-def strict_resp_signatures() -> typing.List[
+def strict_req_resp_signatures() -> typing.List[
     typing.Tuple[inspect.Signature, ASGIAdapter]
 ]:
     async def req_text(req: Request) -> TextResponse:
@@ -167,24 +173,39 @@ def strict_resp_signatures() -> typing.List[
     async def req_bin(req: Request) -> BinaryResponse:
         pass  # pragma: nocover
 
+    async def req_json(req: Request) -> JSONResponse:
+        pass  # pragma: nocover
+
+    async def req_asgi(req: Request) -> ASGICallable:
+        pass  # pragma: nocover
+
+    return [
+        (inspect.signature(req_text), req_adapter_ret_resp),
+        (inspect.signature(req_bin), req_adapter_ret_resp),
+        (inspect.signature(req_json), req_adapter_ret_resp),
+        (inspect.signature(req_asgi), req_adapter),
+    ]
+
+
+def strict_resp_signatures() -> typing.List[
+    typing.Tuple[inspect.Signature, ASGIAdapter]
+]:
     async def text() -> TextResponse:
         pass  # pragma: nocover
 
     async def binary() -> BinaryResponse:
         pass  # pragma: nocover
 
-    async def req_asgi(req: Request) -> ASGICallable:
+    async def json() -> JSONResponse:
         pass  # pragma: nocover
 
     async def asgi() -> ASGICallable:
         pass  # pragma: nocover
 
     return [
-        (inspect.signature(req_text), req_adapter_ret_resp),
-        (inspect.signature(req_bin), req_adapter_ret_resp),
         (inspect.signature(text), no_req_adapter_ret_resp),
         (inspect.signature(binary), no_req_adapter_ret_resp),
-        (inspect.signature(req_asgi), req_adapter),
+        (inspect.signature(json), no_req_adapter_ret_resp),
         (inspect.signature(asgi), no_req_adapter),
     ]
 
@@ -192,7 +213,11 @@ def strict_resp_signatures() -> typing.List[
 def strict_signatures() -> typing.List[
     typing.Tuple[inspect.Signature, ASGIAdapter]
 ]:
-    return strict_stream_signatures() + strict_resp_signatures()
+    return (
+        strict_stream_signatures()
+        + strict_req_resp_signatures()
+        + strict_resp_signatures()
+    )
 
 
 signature_adapters.extend(strict_signatures())

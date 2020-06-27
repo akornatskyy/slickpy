@@ -3,6 +3,11 @@ import typing
 from base64 import b64encode
 from hashlib import sha1
 
+try:
+    from ujson import dumps as ujson_dumps
+except ImportError:  # pragma: nocover
+    ujson_dumps = None  # type: ignore[assignment]
+
 from slickpy.typing import Headers, Receive, Scope, Send
 
 
@@ -124,6 +129,41 @@ class TextResponse(object):
                 b"content-type",
                 (mime_type + "; charset=" + self.charset).encode("latin-1"),
             )
+        )
+
+    async def __call__(
+        self, scope: Scope, receive: Receive, send: Send
+    ) -> None:
+        await send(
+            {
+                "type": "http.response.start",
+                "status": self.status_code,
+                "headers": self.headers,
+            }
+        )
+        await send({"type": "http.response.body", "body": self.body})
+
+
+class JSONResponse(object):
+    __slots__ = ("status_code", "headers", "body")
+
+    def __init__(
+        self,
+        obj: typing.Any,
+        status_code: int = 200,
+        *,
+        headers: typing.Optional[Headers] = None,
+    ):
+        self.status_code = status_code
+        # https://github.com/ultrajson/ultrajson#ensure_ascii
+        body = ujson_dumps(obj, False).encode("utf-8")
+        self.body = body
+        self.headers = headers or []
+        self.headers.append(
+            (b"content-length", str(len(body)).encode("latin-1"))
+        )
+        self.headers.append(
+            (b"content-type", b"application/json; charset=utf-8",)
         )
 
     async def __call__(

@@ -3,7 +3,7 @@ import unittest
 
 from slickpy import App, Request, Writer
 from slickpy.functional import ASGIClient
-from slickpy.response import BinaryResponse, TextResponse
+from slickpy.response import BinaryResponse, JSONResponse, TextResponse
 from slickpy.typing import ASGICallable, Message, Receive, Scope, Send
 
 app = App()
@@ -71,6 +71,21 @@ async def with_request_ret_asgi(req: Request) -> ASGICallable:
     return TextResponse("Hello, world!")
 
 
+@app.route("/no-request-ret-json")
+async def no_request_ret_json(req: Request) -> JSONResponse:
+    return JSONResponse({"message": "Hello, world!"})
+
+
+@app.route("/with-request-ret-json")
+async def with_request_ret_json(req: Request) -> JSONResponse:
+    return JSONResponse({"message": "Hello, world!"})
+
+
+@app.route("/json-ret-asgi")
+async def json_ret_asgi(req: Request) -> ASGICallable:
+    return JSONResponse({"message": "Hello, world!"})
+
+
 @app.route("/stream")
 async def stream(w: Writer) -> None:
     await w.write(b"Hello")
@@ -104,6 +119,16 @@ class AppTestCase(unittest.TestCase):
 
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.text, "Hello, world!")
+
+        for path in [
+            "/no-request-ret-json",
+            "/with-request-ret-json",
+            "/json-ret-asgi",
+        ]:
+            res = client.go(path)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.body, b'{"message":"Hello, world!"}')
 
     def test_status(self) -> None:
         res = client.go("/status")
