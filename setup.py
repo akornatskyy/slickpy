@@ -3,7 +3,7 @@ import re
 from setuptools import setup
 
 README = open("README.md").read()
-version = (
+VERSION = (
     re.search(
         r"__version__ = \"(.+)\"", open("src/slickpy/__init__.py").read()
     )
@@ -13,8 +13,9 @@ version = (
 
 setup(
     name="slickpy",
-    version=version,
-    description="coming soon...",
+    version=VERSION,
+    description="A lightweight ASGI toolkit, optimized for great performance, "
+    "flexibility and productivity.",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/akornatskyy/slickpy",
@@ -45,6 +46,5 @@ setup(
     package_dir={"": "src"},
     zip_safe=True,
     install_requires=[],
-    extras_require={"dev": ["pytest", "pytest-pep8", "pytest-cov"]},
     platforms="any",
 )
