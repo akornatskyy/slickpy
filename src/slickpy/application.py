@@ -110,36 +110,6 @@ def no_req_adapter(handler: NoReqCallable) -> ASGICallable:
     return asgi
 
 
-def req_adapter_ret_resp(handler: ReqRetRespCallable) -> ASGICallable:
-    async def asgi(scope: Scope, receive: Receive, send: Send) -> None:
-        res = await handler(Request(scope, receive))
-        await send(
-            {
-                "type": "http.response.start",
-                "status": res.status_code,
-                "headers": res.headers,
-            }
-        )
-        await send({"type": "http.response.body", "body": res.body})
-
-    return asgi
-
-
-def no_req_adapter_ret_resp(handler: NoReqRetRespCallable,) -> ASGICallable:
-    async def asgi(scope: Scope, receive: Receive, send: Send) -> None:
-        res = await handler()
-        await send(
-            {
-                "type": "http.response.start",
-                "status": res.status_code,
-                "headers": res.headers,
-            }
-        )
-        await send({"type": "http.response.body", "body": res.body})
-
-    return asgi
-
-
 signature_adapters: typing.List[
     typing.Tuple[inspect.Signature, ASGIAdapter]
 ] = []
@@ -180,9 +150,9 @@ def strict_req_resp_signatures() -> typing.List[
         pass  # pragma: nocover
 
     return [
-        (inspect.signature(req_text), req_adapter_ret_resp),
-        (inspect.signature(req_bin), req_adapter_ret_resp),
-        (inspect.signature(req_json), req_adapter_ret_resp),
+        (inspect.signature(req_text), req_adapter),
+        (inspect.signature(req_bin), req_adapter),
+        (inspect.signature(req_json), req_adapter),
         (inspect.signature(req_asgi), req_adapter),
     ]
 
@@ -203,9 +173,9 @@ def strict_resp_signatures() -> typing.List[
         pass  # pragma: nocover
 
     return [
-        (inspect.signature(text), no_req_adapter_ret_resp),
-        (inspect.signature(binary), no_req_adapter_ret_resp),
-        (inspect.signature(json), no_req_adapter_ret_resp),
+        (inspect.signature(text), no_req_adapter),
+        (inspect.signature(binary), no_req_adapter),
+        (inspect.signature(json), no_req_adapter),
         (inspect.signature(asgi), no_req_adapter),
     ]
 
