@@ -35,6 +35,11 @@ async def shutdown_complete() -> None:
 # region: routes
 
 
+@app.route("/")
+async def root() -> TextResponse:
+    return TextResponse("Hello, world!")
+
+
 @app.route("/asgi")
 async def asgi(scope: Scope, receive: Receive, send: Send) -> None:
     await send({"type": "http.response.start", "status": 200, "headers": []})
@@ -72,7 +77,7 @@ async def with_request_ret_asgi(req: Request) -> ASGICallable:
 
 
 @app.route("/no-request-ret-json")
-async def no_request_ret_json(req: Request) -> JSONResponse:
+async def no_request_ret_json() -> JSONResponse:
     return JSONResponse({"message": "Hello, world!"})
 
 
@@ -96,7 +101,7 @@ async def stream(w: Writer) -> None:
 
 @app.route("/status")
 async def status(w: Writer) -> None:
-    await w.status(201)
+    await w.status(204)
     await w.end()
 
 
@@ -106,6 +111,7 @@ client = ASGIClient(app.asgi())
 class AppTestCase(unittest.TestCase):
     def test_adapters(self) -> None:
         for path in [
+            "/",
             "/asgi",
             "/writer",
             "/writer-request",
@@ -133,7 +139,50 @@ class AppTestCase(unittest.TestCase):
     def test_status(self) -> None:
         res = client.go("/status")
 
-        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.status_code, 204)
+        self.assertEqual(res.text, "")
+
+    def test_etag(self) -> None:
+        expected_headers = [
+            (b"content-length", b"13"),
+            (b"content-type", b"text/html; charset=utf-8"),
+            (b"etag", b'W/"d-lDpwLQbzRZmu4fjajvn3KWAx1pk"'),
+        ]
+        res = client.go("/")
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.headers, expected_headers)
+        self.assertEqual(res.text, "Hello, world!")
+
+        res = client.go("/", method="HEAD")
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.headers, expected_headers)
+        self.assertEqual(res.text, "")
+
+        res = client.go("/", headers=[(b"if-none-match", b'W/"abc"')])
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.headers, expected_headers)
+        self.assertEqual(res.text, "Hello, world!")
+
+        res = client.go(
+            "/",
+            headers=[(b"if-none-match", b'W/"d-lDpwLQbzRZmu4fjajvn3KWAx1pk"')],
+        )
+
+        self.assertEqual(res.status_code, 304)
+        self.assertEqual(res.headers, expected_headers)
+        self.assertEqual(res.text, "")
+
+        res = client.go(
+            "/",
+            method="HEAD",
+            headers=[(b"if-none-match", b'W/"d-lDpwLQbzRZmu4fjajvn3KWAx1pk"')],
+        )
+
+        self.assertEqual(res.status_code, 304)
+        self.assertEqual(res.headers, expected_headers)
         self.assertEqual(res.text, "")
 
     def test_on_subscription(self) -> None:

@@ -1,13 +1,8 @@
-import abc
 import typing
 from base64 import b64encode
 from hashlib import sha1
 
-try:
-    from ujson import dumps as ujson_dumps
-except ImportError:  # pragma: nocover
-    ujson_dumps = None  # type: ignore[assignment]
-
+from slickpy.comp import ujson_dumps
 from slickpy.typing import Headers, Receive, Scope, Send
 
 
@@ -67,13 +62,43 @@ class Writer(object):
         await self._send({"type": "http.response.body", "body": chunk})
 
 
-class Response(metaclass=abc.ABCMeta):
+class Response(object):
+    __slots__ = ("status_code", "headers", "body")
     status_code: int
     headers: Headers
     body: bytes
 
+    async def __call__(
+        self, scope: Scope, receive: Receive, send: Send
+    ) -> None:
+        status_code = self.status_code
+        headers = self.headers
+        body = self.body
+        method = scope["method"]
+        no_body = method == "HEAD"
+        if status_code == 200 and (no_body or method == "GET"):
+            etag = make_etag(body)
+            for name, value in scope["headers"]:
+                if name == b"if-none-match":
+                    if etag in value:
+                        status_code = 304
+                        no_body = True
+                    break
+            headers.append((b"etag", etag),)
+        await send(
+            {
+                "type": "http.response.start",
+                "status": status_code,
+                "headers": headers,
+            }
+        )
+        if no_body:
+            await send({"type": "http.response.body"})
+        else:
+            await send({"type": "http.response.body", "body": body})
 
-class BinaryResponse(object):
+
+class BinaryResponse(Response):
     __slots__ = ("status_code", "headers", "body")
 
     def __init__(
@@ -86,29 +111,15 @@ class BinaryResponse(object):
     ):
         self.status_code = status_code
         self.body = body
-        self.headers = headers or []
-        self.headers.append(
+        self.headers = headers = headers or []
+        headers.append(
             (b"content-length", str(len(self.body)).encode("latin-1"))
         )
-        self.headers.append((b"content-type", content_type,))
-
-    async def __call__(
-        self, scope: Scope, receive: Receive, send: Send
-    ) -> None:
-        await send(
-            {
-                "type": "http.response.start",
-                "status": self.status_code,
-                "headers": self.headers,
-            }
-        )
-        await send({"type": "http.response.body", "body": self.body})
+        headers.append((b"content-type", content_type,))
 
 
-class TextResponse(object):
+class TextResponse(Response):
     __slots__ = ("status_code", "headers", "body")
-
-    charset = "utf-8"
 
     def __init__(
         self,
@@ -117,34 +128,23 @@ class TextResponse(object):
         *,
         headers: typing.Optional[Headers] = None,
         mime_type: str = "text/html",
+        charset: str = "utf-8",
     ):
         self.status_code = status_code
-        self.body = content.encode(self.charset)
-        self.headers = headers or []
-        self.headers.append(
+        self.body = content.encode(charset)
+        self.headers = headers = headers or []
+        headers.append(
             (b"content-length", str(len(self.body)).encode("latin-1"))
         )
-        self.headers.append(
+        headers.append(
             (
                 b"content-type",
-                (mime_type + "; charset=" + self.charset).encode("latin-1"),
+                (mime_type + "; charset=" + charset).encode("latin-1"),
             )
         )
 
-    async def __call__(
-        self, scope: Scope, receive: Receive, send: Send
-    ) -> None:
-        await send(
-            {
-                "type": "http.response.start",
-                "status": self.status_code,
-                "headers": self.headers,
-            }
-        )
-        await send({"type": "http.response.body", "body": self.body})
 
-
-class JSONResponse(object):
+class JSONResponse(Response):
     __slots__ = ("status_code", "headers", "body")
 
     def __init__(
@@ -158,22 +158,6 @@ class JSONResponse(object):
         # https://github.com/ultrajson/ultrajson#ensure_ascii
         body = ujson_dumps(obj, False).encode("utf-8")
         self.body = body
-        self.headers = headers or []
-        self.headers.append(
-            (b"content-length", str(len(body)).encode("latin-1"))
-        )
-        self.headers.append(
-            (b"content-type", b"application/json; charset=utf-8",)
-        )
-
-    async def __call__(
-        self, scope: Scope, receive: Receive, send: Send
-    ) -> None:
-        await send(
-            {
-                "type": "http.response.start",
-                "status": self.status_code,
-                "headers": self.headers,
-            }
-        )
-        await send({"type": "http.response.body", "body": self.body})
+        self.headers = headers = headers or []
+        headers.append((b"content-length", str(len(body)).encode("latin-1")))
+        headers.append((b"content-type", b"application/json; charset=utf-8",))
