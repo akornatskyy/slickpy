@@ -7,6 +7,9 @@ from slickpy.multipart import parse_multipart
 content_type = b"multipart/form-data; boundary=---123"
 body_chunks = [
     b"-----123\r\n",
+    b'Content-Disposition: form-data; name="title"\r\n\r\n',
+    b"some title\r\n",
+    b"-----123\r\n",
     b'Content-Disposition: form-data; name="description"\r\n\r\n',
     b"some text\r\n",
     b"-----123\r\n",
@@ -42,7 +45,8 @@ class ParserTestCase(unittest.TestCase):
             parse_multipart(content_type, input(body_chunks))
         )
 
-        self.assertEqual(len(form), 1)
+        self.assertEqual(len(form), 2)
+        self.assertEqual(form.title, "some title")
         self.assertEqual(form.description, "some text")
         self.assertEqual(len(files), 2)
         self.assertEqual(

@@ -78,6 +78,7 @@ async def parse_multipart(  # noqa: C901
         elif name == "headers_finished":
             disposition, options = parse_options_header(content_disposition)
             field_name = options[b"name"].decode("utf-8")
+            field_value = b""
             if b"filename" in options:
                 mfw = MultipartFileWriter(
                     options[b"filename"].decode("utf-8"),
