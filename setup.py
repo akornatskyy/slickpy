@@ -40,7 +40,7 @@ setup(
         "Topic :: Software Development :: Libraries :: Application Frameworks",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    keywords="",
+    keywords="ASGI http web toolkit",
     packages=["slickpy", "slickpy.middleware"],
     package_data={"slickpy": ["py.typed"]},
     package_dir={"": "src"},
