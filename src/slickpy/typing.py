@@ -71,9 +71,7 @@ class ValuesView(typing.ValuesView[T]):
     def __init__(self, mapping: typing.Mapping[str, typing.List[T]]) -> None:
         self._mapping = mapping
 
-    def __contains__(  # type: ignore[override]
-        self, value: T
-    ) -> bool:
+    def __contains__(self, value: T) -> bool:  # type: ignore[override]
         mapping = self._mapping
         for key in mapping:
             for v in mapping[key]:

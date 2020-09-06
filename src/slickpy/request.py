@@ -57,6 +57,7 @@ class Request(object):
             if cookie:
                 self._cookies: typing.Mapping[str, str] = dict(
                     [
+                        # TODO: unquote
                         pair.split("=", 1)  # type: ignore[misc]
                         for pair in cookie.decode("latin-1").split("; ")
                     ]
@@ -65,7 +66,7 @@ class Request(object):
                 self._cookies = {}
         return self._cookies
 
-    async def chunks(self) -> typing.AsyncGenerator[bytes, None]:
+    async def chunks(self) -> typing.AsyncIterator[bytes]:
         while True:
             message = await self._receive()
             if message["type"] == "http.request":

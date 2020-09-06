@@ -25,8 +25,7 @@ class Writer(object):
         self.headersSent = False
 
     async def status(self, code: int) -> None:
-        """ Sends an HTTP response header with provided status code.
-        """
+        """Sends an HTTP response header with provided status code."""
         self.headersSent = True
         await self._send(
             {
@@ -84,7 +83,9 @@ class Response(object):
                         status_code = 304
                         no_body = True
                     break
-            headers.append((b"etag", etag),)
+            headers.append(
+                (b"etag", etag),
+            )
         await send(
             {
                 "type": "http.response.start",
@@ -115,7 +116,12 @@ class BinaryResponse(Response):
         headers.append(
             (b"content-length", str(len(self.body)).encode("latin-1"))
         )
-        headers.append((b"content-type", content_type,))
+        headers.append(
+            (
+                b"content-type",
+                content_type,
+            )
+        )
 
 
 class TextResponse(Response):
@@ -160,4 +166,9 @@ class JSONResponse(Response):
         self.body = body
         self.headers = headers = headers or []
         headers.append((b"content-length", str(len(body)).encode("latin-1")))
-        headers.append((b"content-type", b"application/json; charset=utf-8",))
+        headers.append(
+            (
+                b"content-type",
+                b"application/json; charset=utf-8",
+            )
+        )

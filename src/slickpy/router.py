@@ -52,7 +52,9 @@ def route(
 
 @register_route_adapter
 def regex_route(
-    pattern: str, handler: ASGICallable, http_verbs: HTTPMethods,
+    pattern: str,
+    handler: ASGICallable,
+    http_verbs: HTTPMethods,
 ) -> typing.Optional[RouteResult]:
     return {}, [(re.compile(pattern), (handler, http_verbs))]
 
@@ -62,7 +64,9 @@ RE_PLAIN_ROUTE = re.compile(r"^[\w./-]+$")
 
 @register_route_adapter
 def plain_route(
-    pattern: str, handler: ASGICallable, http_verbs: HTTPMethods,
+    pattern: str,
+    handler: ASGICallable,
+    http_verbs: HTTPMethods,
 ) -> typing.Optional[RouteResult]:
     if pattern == "" or RE_PLAIN_ROUTE.match(pattern):
         return {pattern: (handler, http_verbs)}, []

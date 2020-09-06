@@ -42,7 +42,7 @@ class RequestTestCase(unittest.TestCase):
         req = Request({"headers": []}, noop_receive)
         self.assertEqual(req.cookies, {})
 
-    def test_async_generator(self) -> None:
+    def test_async_iterator(self) -> None:
         async def receive() -> Message:
             return {"type": "http.request", "body": b"Hello, world!"}
 
@@ -110,7 +110,10 @@ class RequestTestCase(unittest.TestCase):
         )
 
     def test_form_no_content_type(self) -> None:
-        req = Request({"headers": []}, noop_receive,)
+        req = Request(
+            {"headers": []},
+            noop_receive,
+        )
 
         loop = asyncio.get_event_loop()
         form = loop.run_until_complete(req.form())
@@ -120,7 +123,8 @@ class RequestTestCase(unittest.TestCase):
 
     def test_form_unknown_content_type(self) -> None:
         req = Request(
-            {"headers": [(b"content-type", b"unknown")]}, noop_receive,
+            {"headers": [(b"content-type", b"unknown")]},
+            noop_receive,
         )
 
         loop = asyncio.get_event_loop()
@@ -213,7 +217,10 @@ class RequestTestCase(unittest.TestCase):
                 "body": b'{"msg":"hello"}',
             }
 
-        req = Request({}, receive,)
+        req = Request(
+            {},
+            receive,
+        )
 
         loop = asyncio.get_event_loop()
         data = loop.run_until_complete(req.json())

@@ -24,7 +24,8 @@ except ImportError:  # pragma: nocover
         raise AssertionError("The 'ujson' package must be installed.")
 
     def ujson_loads(
-        s: typing.AnyStr, precise_float: bool = True,
+        s: typing.AnyStr,
+        precise_float: bool = True,
     ) -> typing.Any:
         raise AssertionError("The 'ujson' package must be installed.")
 

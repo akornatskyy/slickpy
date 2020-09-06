@@ -63,7 +63,12 @@ class ASGIClient(object):
         if headers is None:
             headers = []
         headers.append((b"host", netloc.encode()))
-        headers.append((b"user-agent", b"ASGI Client",))
+        headers.append(
+            (
+                b"user-agent",
+                b"ASGI Client",
+            )
+        )
         scope["headers"] = headers
         res = Response()
 

@@ -2,7 +2,7 @@ import unittest
 
 from slickpy.functional import ASGIClient
 
-from app import main  # noqa: I100
+from app import main  # noqa: I100, isort: skip
 
 
 class AppTestCase(unittest.TestCase):

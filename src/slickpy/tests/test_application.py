@@ -213,7 +213,10 @@ class AppTestCase(unittest.TestCase):
         )
         self.assertEqual(
             sent_events,
-            ["lifespan.startup.complete", "lifespan.shutdown.complete",],
+            [
+                "lifespan.startup.complete",
+                "lifespan.shutdown.complete",
+            ],
         )
 
     def test_middleware(self) -> None:
