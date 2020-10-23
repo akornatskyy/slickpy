@@ -12,7 +12,7 @@ try:
     from ujson import dumps as ujson_dumps, loads as ujson_loads
 except ImportError:  # pragma: nocover
 
-    def ujson_dumps(
+    def ujson_dumps(  # noqa: CFQ002
         obj: typing.Any,
         ensure_ascii: bool = True,
         double_precision: int = 0,

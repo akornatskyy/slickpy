@@ -37,7 +37,7 @@ Operations = typing.List[
 ]
 
 
-async def parse_multipart(  # noqa: C901
+async def parse_multipart(  # noqa: C901, CCR001
     content_type_header: bytes, chunks: typing.AsyncIterator[bytes]
 ) -> typing.Tuple[FormParams, MultipartFiles]:
     assert (
@@ -55,7 +55,7 @@ async def parse_multipart(  # noqa: C901
     form: typing.List[typing.Tuple[str, str]] = []
     files: typing.List[typing.Tuple[str, MultipartFile]] = []
 
-    def callback(
+    def callback(  # noqa: CCR001
         name: str,
         data: typing.Optional[bytes] = None,
         start: typing.Optional[int] = None,

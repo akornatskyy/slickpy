@@ -5,7 +5,7 @@ from time import gmtime, strftime
 _join = "".join
 
 
-def set_cookie(
+def set_cookie(  # noqa: CFQ002
     name: str,
     value: str = "",
     path: str = "",
