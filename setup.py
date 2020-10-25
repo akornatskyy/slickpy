@@ -14,6 +14,7 @@ VERSION = (
 setup(
     name="slickpy",
     version=VERSION,
+    python_requires=">=3.6",
     description="A lightweight ASGI toolkit, optimized for great performance, "
     "flexibility and productivity.",
     long_description=README,
@@ -33,6 +34,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Internet :: WWW/HTTP",
