@@ -17,8 +17,8 @@ class RoutingMiddleware(object):
         path = scope["path"]
         route = self.exact_matches.get(path)
         if route:
-            handler, http_verbs = route
-            if scope["method"] in http_verbs:
+            handler = route.get(scope["method"])
+            if handler:
                 await handler(scope, receive, send)
             else:
                 await handle_http_status(send, 405)
@@ -26,8 +26,8 @@ class RoutingMiddleware(object):
         for regex, route in self.regex_matches:
             m = regex.match(path)
             if m:
-                handler, http_verbs = route
-                if scope["method"] in http_verbs:
+                handler = route.get(scope["method"])
+                if handler:
                     scope["route_params"] = m.groupdict()
                     await handler(scope, receive, send)
                 else:

@@ -16,6 +16,7 @@ from slickpy.typing import (
     ASGIAdapter,
     ASGICallable,
     AnyAsyncCallable,
+    HTTPMethods,
     LifespanSubscriber,
     Middleware,
     Receive,
@@ -45,7 +46,7 @@ class App(object):
         self,
         pattern: str,
         *,
-        methods: typing.Tuple[str, ...] = ("GET", "HEAD"),
+        methods: HTTPMethods = ("GET", "HEAD"),
     ) -> typing.Callable[[AnyAsyncCallable], None]:
         def decorator(handler: AnyAsyncCallable) -> None:
             for asgi_adapter in asgi_adapters:

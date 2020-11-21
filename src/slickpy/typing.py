@@ -14,13 +14,11 @@ ASGICallable = typing.Callable[[Scope, Receive, Send], typing.Awaitable[None]]
 
 # router
 HTTPMethods = typing.Tuple[str, ...]
-RouteMatch = typing.Tuple[ASGICallable, HTTPMethods]
+RouteMatch = typing.Dict[str, ASGICallable]
 ExactMatches = typing.Dict[str, RouteMatch]
 RegexMatches = typing.List[typing.Tuple[typing.Pattern[str], RouteMatch]]
-RouteResult = typing.Tuple[ExactMatches, RegexMatches]
-RouteAdapter = typing.Callable[
-    [str, ASGICallable, HTTPMethods], typing.Optional[RouteResult]
-]
+RouteResult = typing.Tuple[typing.List[str], typing.List[typing.Pattern[str]]]
+RouteAdapter = typing.Callable[[str], typing.Optional[RouteResult]]
 
 # response
 Headers = typing.List[typing.Tuple[bytes, bytes]]
