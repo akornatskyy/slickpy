@@ -79,7 +79,7 @@ class Request(object):
                 raise RuntimeError("http disconnect")
             else:
                 raise NotImplementedError(
-                    f"unexpected message type '{message['type']}' "
+                    f"unexpected message type '{message['type']}'"
                 )
 
     async def body(self) -> bytes:

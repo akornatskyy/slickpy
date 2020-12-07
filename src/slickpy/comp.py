@@ -2,9 +2,9 @@ import sys
 import typing
 
 if sys.version_info[:2] < (3, 7):
-    from asyncio import (
+    from asyncio import (  # pragma: nocover
         _get_running_loop as get_running_loop,
-    )  # pragma: nocover
+    )
 else:
     from asyncio import get_running_loop  # pragma: nocover
 
