@@ -1,5 +1,5 @@
 import typing
-from http.cookies import _quote  # type: ignore[attr-defined]
+from http.cookies import _quote
 from time import gmtime, strftime
 
 _join = "".join
