@@ -35,7 +35,6 @@ ASGIAdapter = typing.Callable[
     [AnyAsyncCallable], typing.Optional[ASGICallable]
 ]
 
-
 # abstractions
 
 
@@ -113,7 +112,7 @@ class Params(typing.Mapping[str, T]):
     def __contains__(self, key: typing.Any) -> bool:
         return key in self._mapping
 
-    def items(self) -> typing.AbstractSet[typing.Tuple[str, T]]:
+    def items(self) -> typing.ItemsView[str, T]:
         return ItemsView(self._mapping)
 
     def values(self) -> typing.ValuesView[T]:

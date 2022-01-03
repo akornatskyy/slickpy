@@ -58,7 +58,7 @@ class Request(object):
                 self._cookies: typing.Mapping[str, str] = dict(
                     [
                         # TODO: unquote
-                        pair.split("=", 1)  # type: ignore[misc]
+                        pair.split("=", 1)
                         for pair in cookie.decode("latin-1").split("; ")
                     ]
                 )
