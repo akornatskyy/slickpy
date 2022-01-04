@@ -5,7 +5,7 @@
 [![pypi version](https://badge.fury.io/py/slickpy.svg)](https://badge.fury.io/py/slickpy)
 
 A lightweight [ASGI](https://asgi.readthedocs.io/en/latest/index.html)
-Python 3.6+ toolkit, optimized for great performance, flexibility and
+Python 3.7+ toolkit, optimized for great performance, flexibility and
 productivity.
 
 ## Install
