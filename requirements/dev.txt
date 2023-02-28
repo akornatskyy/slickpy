@@ -10,15 +10,8 @@ build==0.10.0
     # via pip-tools
 click==8.1.3
     # via pip-tools
-colorama==0.4.6
-    # via
-    #   build
-    #   click
-    #   pytest
 coverage[toml]==7.1.0
     # via pytest-cov
-exceptiongroup==1.1.0
-    # via pytest
 iniconfig==2.0.0
     # via pytest
 packaging==23.0
@@ -37,15 +30,8 @@ pytest==7.2.1
     #   pytest-cov
 pytest-cov==4.0.0
     # via -r requirements/dev.in
-python-multipart==0.0.5
+python-multipart==0.0.6
     # via -r requirements/dev.in
-six==1.16.0
-    # via python-multipart
-tomli==2.0.1
-    # via
-    #   build
-    #   coverage
-    #   pytest
 ujson==5.7.0
     # via -r requirements/dev.in
 wheel==0.38.4
