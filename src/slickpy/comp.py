@@ -20,11 +20,17 @@ except ImportError:  # pragma: nocover
         escape_forward_slashes: bool = True,
         sort_keys: bool = False,
         indent: int = 0,
+        allow_nan: bool = False,
+        reject_bytes: bool = False,
+        default: typing.Optional[
+            typing.Callable[[typing.Any], typing.Any]
+        ] = None,
+        separators: typing.Optional[typing.Tuple[str, str]] = None,
     ) -> str:
         raise AssertionError("The 'ujson' package must be installed.")
 
     def ujson_loads(
-        s: typing.AnyStr,
+        s: typing.Union[str, bytes, bytearray],
         precise_float: bool = True,
     ) -> typing.Any:
         raise AssertionError("The 'ujson' package must be installed.")
