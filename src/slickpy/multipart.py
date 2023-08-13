@@ -127,7 +127,7 @@ async def parse_multipart(  # noqa: C901, CCR001
 
 
 def flush_pending_io(operations: Operations) -> None:
-    for (mf, data) in operations:
+    for mf, data in operations:
         if data is None:
             mf.seek()
         else:
