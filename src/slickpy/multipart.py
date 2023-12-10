@@ -2,8 +2,7 @@ import typing
 from tempfile import SpooledTemporaryFile
 
 try:
-    from multipart.multipart import MultipartParser  # type: ignore[import]
-    from multipart.multipart import parse_options_header
+    from multipart.multipart import MultipartParser, parse_options_header
 except ImportError:  # pragma: nocover
     parse_options_header = None
 
