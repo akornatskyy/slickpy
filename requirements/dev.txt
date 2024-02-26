@@ -8,11 +8,6 @@ build==1.0.3
     # via pip-tools
 click==8.1.7
     # via pip-tools
-colorama==0.4.6
-    # via
-    #   build
-    #   click
-    #   pytest
 coverage==7.4.1
     # via
     #   coverage
@@ -29,7 +24,7 @@ pluggy==1.4.0
     # via pytest
 pyproject-hooks==1.0.0
     # via build
-pytest==8.0.0
+pytest==8.0.2
     # via
     #   -r requirements/dev.in
     #   pytest-cov
