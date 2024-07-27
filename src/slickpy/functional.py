@@ -4,7 +4,7 @@ from urllib.parse import unquote, urljoin, urlsplit
 
 from slickpy.typing import ASGICallable, Headers, Message
 
-default_scope = {
+default_scope: typing.Dict[str, typing.Any] = {
     "type": "http",
     "asgi": {"version": "3.0", "spec_version": "2.1"},
     "http_version": "1.1",
