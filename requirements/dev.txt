@@ -8,11 +8,6 @@ build==1.2.2
     # via pip-tools
 click==8.1.7
     # via pip-tools
-colorama==0.4.6
-    # via
-    #   build
-    #   click
-    #   pytest
 coverage==7.6.1
     # via pytest-cov
 iniconfig==2.0.0
@@ -35,7 +30,7 @@ pytest==8.3.3
     #   pytest-cov
 pytest-cov==5.0.0
     # via -r requirements/dev.in
-python-multipart==0.0.12
+python-multipart==0.0.17
     # via -r requirements/dev.in
 ujson==5.10.0
     # via -r requirements/dev.in
