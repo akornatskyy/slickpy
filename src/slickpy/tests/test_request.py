@@ -51,8 +51,7 @@ class RequestTestCase(unittest.TestCase):
         async def read() -> bytes:
             return b"".join([chunk async for chunk in req.chunks()])
 
-        loop = asyncio.get_event_loop()
-        body: bytes = loop.run_until_complete(read())
+        body: bytes = asyncio.run(read())
 
         self.assertEqual(body, b"Hello, world!")
 
@@ -71,8 +70,7 @@ class RequestTestCase(unittest.TestCase):
                 return {"type": "http.request"}
 
         req = Request({}, receive)
-        loop = asyncio.get_event_loop()
-        body = loop.run_until_complete(req.body())
+        body = asyncio.run(req.body())
 
         self.assertEqual(body, b"Hello, world!")
 
@@ -84,8 +82,7 @@ class RequestTestCase(unittest.TestCase):
             }
 
         req = Request({}, receive)
-        loop = asyncio.get_event_loop()
-        body = loop.run_until_complete(req.body())
+        body = asyncio.run(req.body())
 
         self.assertEqual(body, b"")
 
@@ -94,20 +91,14 @@ class RequestTestCase(unittest.TestCase):
             return {"type": "http.disconnect"}
 
         req = Request({}, receive)
-        loop = asyncio.get_event_loop()
-        self.assertRaises(
-            RuntimeError, lambda: loop.run_until_complete(req.body())
-        )
+        self.assertRaises(RuntimeError, lambda: asyncio.run(req.body()))
 
     def test_body_unexpected_message(self) -> None:
         async def receive() -> Message:
             return {"type": "abc"}
 
         req = Request({}, receive)
-        loop = asyncio.get_event_loop()
-        self.assertRaises(
-            NotImplementedError, lambda: loop.run_until_complete(req.body())
-        )
+        self.assertRaises(NotImplementedError, lambda: asyncio.run(req.body()))
 
     def test_form_no_content_type(self) -> None:
         req = Request(
@@ -115,10 +106,9 @@ class RequestTestCase(unittest.TestCase):
             noop_receive,
         )
 
-        loop = asyncio.get_event_loop()
-        form = loop.run_until_complete(req.form())
+        form = asyncio.run(req.form())
         self.assertEqual(len(form), 0)
-        files = loop.run_until_complete(req.files())
+        files = asyncio.run(req.files())
         self.assertEqual(len(files), 0)
 
     def test_form_unknown_content_type(self) -> None:
@@ -127,10 +117,9 @@ class RequestTestCase(unittest.TestCase):
             noop_receive,
         )
 
-        loop = asyncio.get_event_loop()
-        form = loop.run_until_complete(req.form())
+        form = asyncio.run(req.form())
         self.assertEqual(len(form), 0)
-        files = loop.run_until_complete(req.files())
+        files = asyncio.run(req.files())
         self.assertEqual(len(files), 0)
 
     def test_form_urlencoded(self) -> None:
@@ -149,11 +138,10 @@ class RequestTestCase(unittest.TestCase):
             receive,
         )
 
-        loop = asyncio.get_event_loop()
-        form = loop.run_until_complete(req.form())
+        form = asyncio.run(req.form())
         self.assertEqual(len(form), 1)
         self.assertEqual(form.msg, "hello")
-        files = loop.run_until_complete(req.files())
+        files = asyncio.run(req.files())
         self.assertEqual(len(files), 0)
 
     def test_form_multipart(self) -> None:
@@ -175,11 +163,10 @@ class RequestTestCase(unittest.TestCase):
             receive,
         )
 
-        loop = asyncio.get_event_loop()
-        form = loop.run_until_complete(req.form())
+        form = asyncio.run(req.form())
         self.assertEqual(len(form), 1)
         self.assertEqual(form.msg, "hello")
-        files = loop.run_until_complete(req.files())
+        files = asyncio.run(req.files())
         self.assertEqual(len(files), 0)
 
     def test_files_multipart(self) -> None:
@@ -204,10 +191,9 @@ class RequestTestCase(unittest.TestCase):
             receive,
         )
 
-        loop = asyncio.get_event_loop()
-        files = loop.run_until_complete(req.files())
+        files = asyncio.run(req.files())
         self.assertEqual(len(files), 1)
-        form = loop.run_until_complete(req.form())
+        form = asyncio.run(req.form())
         self.assertEqual(len(form), 0)
 
     def test_json(self) -> None:
@@ -222,7 +208,6 @@ class RequestTestCase(unittest.TestCase):
             receive,
         )
 
-        loop = asyncio.get_event_loop()
-        data = loop.run_until_complete(req.json())
+        data = asyncio.run(req.json())
 
         self.assertEqual(data, {"msg": "hello"})

@@ -90,8 +90,7 @@ class MultipartFileTestCase(unittest.TestCase):
             async with MultipartFile("", "", False, io.BytesIO(b"hi")) as f:
                 return await f.read()
 
-        loop = asyncio.get_event_loop()
-        self.assertEqual(loop.run_until_complete(f()), b"hi")
+        self.assertEqual(asyncio.run(f()), b"hi")
 
     def test_context_manager_raises_value_error(self) -> None:
         async def f() -> None:
@@ -101,8 +100,7 @@ class MultipartFileTestCase(unittest.TestCase):
             async with f:
                 pass  # pragma: nocover
 
-        loop = asyncio.get_event_loop()
-        self.assertRaises(ValueError, lambda: loop.run_until_complete(f()))
+        self.assertRaises(ValueError, lambda: asyncio.run(f()))
 
 
 class MultipartFilesTestCase(unittest.TestCase):
@@ -111,5 +109,4 @@ class MultipartFilesTestCase(unittest.TestCase):
             async with MultipartFiles([]) as files:
                 await files.close()
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(f())
+        asyncio.run(f())

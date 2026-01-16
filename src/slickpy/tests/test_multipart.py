@@ -40,8 +40,7 @@ class ParserTestCase(unittest.TestCase):
             except StopIteration:
                 pass
 
-        loop = asyncio.get_event_loop()
-        form, files = loop.run_until_complete(
+        form, files = asyncio.run(
             parse_multipart(content_type, input(body_chunks))
         )
 
@@ -61,10 +60,10 @@ class ParserTestCase(unittest.TestCase):
         )
         foo = files["secret-foo"]
         self.assertEqual(
-            loop.run_until_complete(foo.read()),
+            asyncio.run(foo.read()),
             b"(content of the uploaded file foo.txt)",
         )
         boo = files["secret-boo"]
-        self.assertEqual(len(loop.run_until_complete(boo.read())), 1120010)
+        self.assertEqual(len(asyncio.run(boo.read())), 1120010)
 
-        loop.run_until_complete(files.close())
+        asyncio.run(files.close())

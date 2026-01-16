@@ -34,6 +34,9 @@ AnyAsyncCallable = typing.Callable[..., typing.Awaitable[typing.Any]]
 ASGIAdapter = typing.Callable[
     [AnyAsyncCallable], typing.Optional[ASGICallable]
 ]
+ASGIResourceAdapter = typing.Callable[
+    ..., typing.Iterator[typing.Tuple[ASGICallable, str]]
+]
 
 # abstractions
 

@@ -85,7 +85,8 @@ class ASGIClient(object):
                 if chunk is not None:
                     res.chunks.append(chunk)
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(self.app(scope, receive, send))
+        loop.close()
 
         return res

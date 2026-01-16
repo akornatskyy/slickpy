@@ -197,10 +197,11 @@ class AppTestCase(unittest.TestCase):
         async def send(m: Message) -> None:
             sent_events.append(m["type"])
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(
             app.asgi()({"type": "lifespan"}, receive, send)
         )
+        loop.close()
 
         self.assertEqual(
             events,
@@ -280,10 +281,11 @@ class AppTestCase(unittest.TestCase):
         async def send(m: Message) -> None:
             sent_events.append(m["type"])
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(
             main.asgi()({"type": "lifespan"}, receive, send)
         )
+        loop.close()
 
         self.assertEqual(dispatched_events, ["shutdown", "shutdown.failed"])
         self.assertEqual(sent_events, ["lifespan.shutdown.failed"])

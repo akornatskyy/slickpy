@@ -116,9 +116,9 @@ signature_adapters: typing.List[
 ] = []
 
 
-def strict_stream_signatures() -> typing.List[
-    typing.Tuple[inspect.Signature, ASGIAdapter]
-]:
+def strict_stream_signatures() -> (
+    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
+):
     async def direct(scope: Scope, receive: Receive, send: Send) -> None:
         pass  # pragma: nocover
 
@@ -135,9 +135,9 @@ def strict_stream_signatures() -> typing.List[
     ]
 
 
-def strict_req_resp_signatures() -> typing.List[
-    typing.Tuple[inspect.Signature, ASGIAdapter]
-]:
+def strict_req_resp_signatures() -> (
+    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
+):
     async def req_text(req: Request) -> TextResponse:
         pass  # pragma: nocover
 
@@ -158,9 +158,9 @@ def strict_req_resp_signatures() -> typing.List[
     ]
 
 
-def strict_resp_signatures() -> typing.List[
-    typing.Tuple[inspect.Signature, ASGIAdapter]
-]:
+def strict_resp_signatures() -> (
+    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
+):
     async def text() -> TextResponse:
         pass  # pragma: nocover
 
@@ -181,9 +181,9 @@ def strict_resp_signatures() -> typing.List[
     ]
 
 
-def strict_signatures() -> typing.List[
-    typing.Tuple[inspect.Signature, ASGIAdapter]
-]:
+def strict_signatures() -> (
+    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
+):
     return (
         strict_stream_signatures()
         + strict_req_resp_signatures()
