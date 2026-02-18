@@ -1,7 +1,7 @@
 import typing
 from urllib.parse import parse_qsl
 
-from slickpy.comp import ujson_loads
+from slickpy.comp import json_loads
 from slickpy.multipart import parse_multipart
 from slickpy.typing import (
     FormParams,
@@ -118,5 +118,5 @@ class Request(object):
 
     async def json(self) -> typing.Any:
         if not hasattr(self, "_json"):
-            self._json = ujson_loads(await self.body())
+            self._json = json_loads(await self.body())
         return self._json

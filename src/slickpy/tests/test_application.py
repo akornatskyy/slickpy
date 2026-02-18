@@ -2,6 +2,7 @@ import asyncio
 import unittest
 
 from slickpy import App, Request, Writer
+from slickpy.comp import json_loads
 from slickpy.functional import ASGIClient
 from slickpy.response import BinaryResponse, JSONResponse, TextResponse
 from slickpy.typing import ASGICallable, Message, Receive, Scope, Send
@@ -134,7 +135,9 @@ class AppTestCase(unittest.TestCase):
             res = client.go(path)
 
             self.assertEqual(res.status_code, 200)
-            self.assertEqual(res.body, b'{"message":"Hello, world!"}')
+            self.assertEqual(
+                json_loads(res.body), {"message": "Hello, world!"}
+            )
 
     def test_status(self) -> None:
         res = client.go("/status")

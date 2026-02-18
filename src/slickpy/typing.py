@@ -1,7 +1,6 @@
 import types
 import typing
-
-from slickpy.comp import get_running_loop
+from asyncio import get_running_loop
 
 T = typing.TypeVar("T")
 
@@ -33,9 +32,6 @@ Middleware = typing.Callable[[ASGICallable], ASGICallable]
 AnyAsyncCallable = typing.Callable[..., typing.Awaitable[typing.Any]]
 ASGIAdapter = typing.Callable[
     [AnyAsyncCallable], typing.Optional[ASGICallable]
-]
-ASGIResourceAdapter = typing.Callable[
-    ..., typing.Iterator[typing.Tuple[ASGICallable, str]]
 ]
 
 # abstractions

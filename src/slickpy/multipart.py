@@ -1,12 +1,15 @@
 import typing
+from asyncio import get_running_loop
 from tempfile import SpooledTemporaryFile
 
 try:
-    from multipart.multipart import MultipartParser, parse_options_header
+    from python_multipart.multipart import (
+        MultipartParser,
+        parse_options_header,
+    )
 except ImportError:  # pragma: nocover
     parse_options_header = None
 
-from slickpy.comp import get_running_loop
 from slickpy.typing import FormParams, MultipartFile, MultipartFiles
 
 

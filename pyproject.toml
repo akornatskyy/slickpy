@@ -35,14 +35,21 @@ classifiers = [
 Homepage = "https://github.com/akornatskyy/slickpy"
 
 [tool.setuptools]
+packages = ["slickpy", "slickpy.experimental", "slickpy.middleware"]
+package-dir = { "" = "src" }
 zip-safe = true
+include-package-data = true
 platforms = ["any"]
+
+[tool.setuptools.package-data]
+slickpy = ["py.typed"]
 
 [tool.setuptools.dynamic]
 version = { attr = "slickpy.__version__" }
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.pytest.ini_options]
+pythonpath = ["src"]
 
-[tool.setuptools.package-data]
-slickpy = ["py.typed"]
+[tool.coverage.run]
+source = ["src/slickpy"]
+omit = ["*/test_*.py", "*/tests/*"]

@@ -2,7 +2,7 @@ import typing
 from base64 import b64encode
 from hashlib import sha1
 
-from slickpy.comp import ujson_dumps
+from slickpy.comp import json_dumps
 from slickpy.typing import Headers, Receive, Scope, Send
 
 
@@ -161,8 +161,10 @@ class JSONResponse(Response):
         headers: typing.Optional[Headers] = None,
     ):
         self.status_code = status_code
-        # https://github.com/ultrajson/ultrajson#ensure_ascii
-        body = ujson_dumps(obj, False).encode("utf-8")
+        body = json_dumps(
+            obj,
+            ensure_ascii=False,
+        ).encode("utf-8")
         self.body = body
         self.headers = headers = headers or []
         headers.append((b"content-length", str(len(body)).encode("latin-1")))
