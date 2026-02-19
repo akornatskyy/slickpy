@@ -41,6 +41,21 @@ class RequestTestCase(unittest.TestCase):
         self.assertEqual(req.cookies, {"PREF": "abc", "ID": "1234"})
         req = Request({"headers": []}, noop_receive)
         self.assertEqual(req.cookies, {})
+        req = Request(
+            {"headers": [(b"cookie", b"key_without_value")]}, noop_receive
+        )
+        self.assertEqual(req.cookies, {})
+        req = Request(
+            {"headers": [(b"cookie", b"a=1; malformed; b=2; =oops")]},
+            noop_receive,
+        )
+        self.assertEqual(
+            req.cookies,
+            {
+                "a": "1",
+                "b": "2",
+            },
+        )
 
     def test_async_iterator(self) -> None:
         async def receive() -> Message:

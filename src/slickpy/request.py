@@ -51,17 +51,22 @@ class Request(object):
         return self._headers
 
     @property
-    def cookies(self) -> typing.Mapping[str, str]:
+    def cookies(self) -> typing.Mapping[str, str]:  # noqa: CCR001
         if not hasattr(self, "_cookies"):
             cookie = self.headers.get(b"cookie")
             if cookie:
-                self._cookies: typing.Mapping[str, str] = dict(
-                    [
-                        # TODO: unquote
-                        pair.split("=", 1)
-                        for pair in cookie.decode("latin-1").split("; ")
-                    ]
-                )
+                result = {}
+                for pair in cookie.decode("latin-1").split(";"):
+                    if "=" not in pair:
+                        continue
+
+                    name, value = pair.split("=", 1)
+                    name = name.strip()
+                    if not name:
+                        continue
+
+                    result[name] = value.strip()
+                self._cookies = result
             else:
                 self._cookies = {}
         return self._cookies
