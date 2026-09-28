@@ -10,7 +10,7 @@ from slickpy.typing import ASGICallable, Message, Receive, Scope, Send
 app = App()
 
 # region: lifespan events
-events = []
+events: list[str] = []
 
 
 @app.on("lifespan.startup")
