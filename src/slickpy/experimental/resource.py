@@ -7,15 +7,14 @@ from slickpy.typing import AnyAsyncCallable
 HTTP_METHODS = ("GET", "HEAD", "POST", "PUT", "PATCH", "DELETE")
 
 
-class ResourceAdapter(object):
-
+class ResourceAdapter:
     def __init__(self, app: App):
         self.app = app
 
     def __call__(
         self,
         pattern: str,
-    ) -> typing.Callable[[typing.Type], None]:  # type: ignore[type-arg]
+    ) -> typing.Callable[[type], None]:
         def decorator(
             handler: AnyAsyncCallable,
         ) -> None:

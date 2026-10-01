@@ -11,14 +11,14 @@ from slickpy.typing import (
     RouteResult,
 )
 
-pattern_adapters: typing.List[RouteAdapter] = []
+pattern_adapters: list[RouteAdapter] = []
 
 
 def register_route_adapter(fn: RouteAdapter) -> None:
     pattern_adapters.insert(0, fn)
 
 
-class Router(object):
+class Router:
     def __init__(self) -> None:
         self.exact_matches: ExactMatches = {}
         self.regex_matches: RegexMatches = []
@@ -38,7 +38,7 @@ class Router(object):
 
 def merge_exact_matches(
     exact_matches: ExactMatches,
-    patterns: typing.List[str],
+    patterns: list[str],
     route_match: RouteMatch,
 ) -> None:
     for pattern in patterns:
@@ -51,15 +51,14 @@ def merge_exact_matches(
 
 def merge_regex_matches(
     regex_matches: RegexMatches,
-    patterns: typing.List[typing.Pattern[str]],
+    patterns: list[typing.Pattern[str]],
     route_match: RouteMatch,
 ) -> None:
     for pattern in patterns:
         for p, m in regex_matches:
             if pattern.pattern == p.pattern:
                 m.update(route_match)
-        else:
-            regex_matches.append((pattern, route_match))
+        regex_matches.append((pattern, route_match))
 
 
 def route(pattern: str) -> RouteResult:
@@ -67,14 +66,13 @@ def route(pattern: str) -> RouteResult:
         r = pattern_adapter(pattern)
         if r:
             return r
-    else:  # pragma: nocover
-        # unreachable code since regex route unconditionally returns
-        # a compiled patter or fails to compile
-        raise AssertionError(f"unable to find adapter for pattern '{pattern}'")
+    # unreachable code since regex route unconditionally returns
+    # a compiled patter or fails to compile
+    raise AssertionError(f"unable to find adapter for pattern '{pattern}'")
 
 
 @register_route_adapter
-def regex_route(pattern: str) -> typing.Optional[RouteResult]:
+def regex_route(pattern: str) -> RouteResult | None:
     return [], [re.compile(pattern)]
 
 
@@ -82,7 +80,7 @@ RE_PLAIN_ROUTE = re.compile(r"^[\w./-]+$")
 
 
 @register_route_adapter
-def plain_route(pattern: str) -> typing.Optional[RouteResult]:
+def plain_route(pattern: str) -> RouteResult | None:
     if pattern == "" or RE_PLAIN_ROUTE.match(pattern):
         return [pattern], []
     return None

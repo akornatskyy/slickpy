@@ -12,15 +12,15 @@ Send = typing.Callable[[Message], typing.Awaitable[None]]
 ASGICallable = typing.Callable[[Scope, Receive, Send], typing.Awaitable[None]]
 
 # router
-HTTPMethods = typing.Tuple[str, ...]
-RouteMatch = typing.Dict[str, ASGICallable]
-ExactMatches = typing.Dict[str, RouteMatch]
-RegexMatches = typing.List[typing.Tuple[typing.Pattern[str], RouteMatch]]
-RouteResult = typing.Tuple[typing.List[str], typing.List[typing.Pattern[str]]]
-RouteAdapter = typing.Callable[[str], typing.Optional[RouteResult]]
+HTTPMethods = tuple[str, ...]
+RouteMatch = dict[str, ASGICallable]
+ExactMatches = dict[str, RouteMatch]
+RegexMatches = list[tuple[typing.Pattern[str], RouteMatch]]
+RouteResult = tuple[list[str], list[typing.Pattern[str]]]
+RouteAdapter = typing.Callable[[str], RouteResult | None]
 
 # response
-Headers = typing.List[typing.Tuple[bytes, bytes]]
+Headers = list[tuple[bytes, bytes]]
 
 # lifespan
 LifespanSubscriber = typing.Callable[[], typing.Awaitable[None]]
@@ -30,9 +30,7 @@ Middleware = typing.Callable[[ASGICallable], ASGICallable]
 
 # application
 AnyAsyncCallable = typing.Callable[..., typing.Awaitable[typing.Any]]
-ASGIAdapter = typing.Callable[
-    [AnyAsyncCallable], typing.Optional[ASGICallable]
-]
+ASGIAdapter = typing.Callable[[AnyAsyncCallable], ASGICallable | None]
 
 # abstractions
 
@@ -40,11 +38,11 @@ ASGIAdapter = typing.Callable[
 class ItemsView(typing.ItemsView[str, T]):
     __slots__ = ("_mapping",)
 
-    def __init__(self, mapping: typing.Mapping[str, typing.List[T]]) -> None:
+    def __init__(self, mapping: typing.Mapping[str, list[T]]) -> None:
         self._mapping = mapping
 
     def __contains__(  # type: ignore[override]
-        self, item: typing.Tuple[str, T]
+        self, item: tuple[str, T]
     ) -> bool:
         key, value = item
         mapping = self._mapping
@@ -54,7 +52,7 @@ class ItemsView(typing.ItemsView[str, T]):
                     return True
         return False
 
-    def __iter__(self) -> typing.Iterator[typing.Tuple[str, T]]:
+    def __iter__(self) -> typing.Iterator[tuple[str, T]]:
         mapping = self._mapping
         for key in mapping:
             for value in mapping[key]:
@@ -64,7 +62,7 @@ class ItemsView(typing.ItemsView[str, T]):
 class ValuesView(typing.ValuesView[T]):
     __slots__ = ("_mapping",)
 
-    def __init__(self, mapping: typing.Mapping[str, typing.List[T]]) -> None:
+    def __init__(self, mapping: typing.Mapping[str, list[T]]) -> None:
         self._mapping = mapping
 
     def __contains__(self, value: T) -> bool:  # type: ignore[override]
@@ -78,15 +76,14 @@ class ValuesView(typing.ValuesView[T]):
     def __iter__(self) -> typing.Iterator[T]:
         mapping = self._mapping
         for key in mapping:
-            for value in mapping[key]:
-                yield value
+            yield from mapping[key]
 
 
 class Params(typing.Mapping[str, T]):
     __slots__ = ("_mapping",)
 
-    def __init__(self, pairs: typing.List[typing.Tuple[str, T]]) -> None:
-        mapping: typing.MutableMapping[str, typing.List[T]] = {}
+    def __init__(self, pairs: list[tuple[str, T]]) -> None:
+        mapping: typing.MutableMapping[str, list[T]] = {}
         for key, value in pairs:
             if key in mapping:
                 mapping[key].append(value)
@@ -118,13 +115,13 @@ class Params(typing.Mapping[str, T]):
         return ValuesView(self._mapping)
 
     def get(  # type: ignore[override]
-        self, key: str, default: typing.Optional[T] = None
-    ) -> typing.Optional[T]:
+        self, key: str, default: T | None = None
+    ) -> T | None:
         if key in self._mapping:
             return self._mapping[key][-1]
         return default
 
-    def getlist(self, key: str) -> typing.List[T]:
+    def getlist(self, key: str) -> list[T]:
         if key in self._mapping:
             return self._mapping[key]
         return []
@@ -139,7 +136,7 @@ FormParams = Params[str]
 TMF = typing.TypeVar("TMF", bound="MultipartFile")
 
 
-class MultipartFile(object):
+class MultipartFile:
     def __init__(
         self,
         name: str,
@@ -159,9 +156,9 @@ class MultipartFile(object):
 
     async def __aexit__(
         self,
-        exc_type: typing.Optional[typing.Type[BaseException]],
-        exc_value: typing.Optional[BaseException],
-        traceback: typing.Optional[types.TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: types.TracebackType | None,
     ) -> None:
         await self.close()
 
@@ -188,9 +185,9 @@ class MultipartFiles(Params[MultipartFile]):
 
     async def __aexit__(
         self,
-        exc_type: typing.Optional[typing.Type[BaseException]],
-        exc_value: typing.Optional[BaseException],
-        traceback: typing.Optional[types.TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: types.TracebackType | None,
     ) -> None:
         await self.close()
 

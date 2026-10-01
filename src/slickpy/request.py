@@ -12,9 +12,8 @@ from slickpy.typing import (
 )
 
 
-class Request(object):
+class Request:
     __slots__ = (
-        "scope",
         "_body",
         "_cookies",
         "_files",
@@ -23,6 +22,7 @@ class Request(object):
         "_json",
         "_query_params",
         "_receive",
+        "scope",
     )
 
     def __init__(self, scope: Scope, receive: Receive):

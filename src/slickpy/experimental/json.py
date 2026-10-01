@@ -12,10 +12,10 @@ from slickpy.typing import (
 )
 
 NoReqDictCallable = typing.Callable[
-    [], typing.Awaitable[typing.Dict]  # type: ignore[type-arg]
+    [], typing.Awaitable[dict]  # type: ignore[type-arg]
 ]
 ReqDictCallable = typing.Callable[
-    [Request], typing.Awaitable[typing.Dict]  # type: ignore[type-arg]
+    [Request], typing.Awaitable[dict]  # type: ignore[type-arg]
 ]
 
 
@@ -69,13 +69,11 @@ def req_dict_adapter(handler: ReqDictCallable) -> ASGICallable:
     return asgi
 
 
-def json_signatures() -> (
-    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
-):
-    async def no_req_dict() -> typing.Dict:  # type: ignore[type-arg]
+def json_signatures() -> list[tuple[inspect.Signature, ASGIAdapter]]:
+    async def no_req_dict() -> dict:  # type: ignore[type-arg]
         pass  # pragma: nocover
 
-    async def req_dict(req: Request) -> typing.Dict:  # type: ignore[type-arg]
+    async def req_dict(req: Request) -> dict:  # type: ignore[type-arg]
         pass  # pragma: nocover
 
     return [

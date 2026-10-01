@@ -1,12 +1,11 @@
 import logging
-import typing
 
 from slickpy.typing import LifespanSubscriber, Receive, Scope, Send
 
 
-class Topic(object):
+class Topic:
     def __init__(self) -> None:
-        self.subscribers: typing.List[LifespanSubscriber] = []
+        self.subscribers: list[LifespanSubscriber] = []
 
     def add(self, subscriber: LifespanSubscriber) -> None:
         self.subscribers.append(subscriber)
@@ -16,10 +15,10 @@ class Topic(object):
             await subscriber()
 
 
-class Lifespan(object):
+class Lifespan:
     def __init__(self) -> None:
         self.logger = logging.getLogger("slickpy.lifespan")
-        self.topics: typing.Dict[str, Topic] = {}
+        self.topics: dict[str, Topic] = {}
 
     def add(self, event: str, subscriber: LifespanSubscriber) -> None:
         topic = self.topics.get(event)
@@ -47,7 +46,7 @@ class Lifespan(object):
                 await self.notify(event)
                 await self.notify(event_complete)
                 self.logger.info(event_complete)
-            except Exception as ex:
+            except Exception as ex:  # noqa: BLE001
                 # TODO: logging
                 event_failed = event + ".failed"
                 await self.notify(event_failed)

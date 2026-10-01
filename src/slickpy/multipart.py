@@ -13,14 +13,17 @@ except ImportError:  # pragma: nocover
 from slickpy.typing import FormParams, MultipartFile, MultipartFiles
 
 
-class MultipartFileWriter(object):
+class MultipartFileWriter:
     roll_size = 1024 * 1024
 
     def __init__(self, name: str, content_type: str) -> None:
         self.name = name
         self.content_type = content_type
         self.size = 0
-        self.file = SpooledTemporaryFile(max_size=self.roll_size)
+        # closed by MultipartFile.close()
+        self.file = SpooledTemporaryFile(  # noqa: SIM115
+            max_size=self.roll_size
+        )
 
     def would_roll(self, size: int) -> bool:
         return self.size + size >= self.roll_size
@@ -34,14 +37,12 @@ class MultipartFileWriter(object):
         return self.file.seek(0)
 
 
-Operations = typing.List[
-    typing.Tuple[MultipartFileWriter, typing.Optional[bytes]]
-]
+Operations = list[tuple[MultipartFileWriter, bytes | None]]
 
 
 async def parse_multipart(  # noqa: C901, CCR001
     content_type_header: bytes, chunks: typing.AsyncIterator[bytes]
-) -> typing.Tuple[FormParams, MultipartFiles]:
+) -> tuple[FormParams, MultipartFiles]:
     assert (
         parse_options_header is not None
     ), "The 'python-multipart' package must be installed."
@@ -51,17 +52,17 @@ async def parse_multipart(  # noqa: C901, CCR001
     content_disposition = b""
     field_name = ""
     field_value = b""
-    mfw: typing.Optional[MultipartFileWriter] = None
+    mfw: MultipartFileWriter | None = None
 
     io_pending: Operations = []
-    form: typing.List[typing.Tuple[str, str]] = []
-    files: typing.List[typing.Tuple[str, MultipartFile]] = []
+    form: list[tuple[str, str]] = []
+    files: list[tuple[str, MultipartFile]] = []
 
     def callback(  # noqa: CCR001
         name: str,
-        data: typing.Optional[bytes] = None,
-        start: typing.Optional[int] = None,
-        end: typing.Optional[int] = None,
+        data: bytes | None = None,
+        start: int | None = None,
+        end: int | None = None,
     ) -> None:
         nonlocal header_field, header_value, content_disposition, content_type
         nonlocal field_name, field_value, mfw
@@ -78,7 +79,7 @@ async def parse_multipart(  # noqa: C901, CCR001
             header_field = b""
             header_value = b""
         elif name == "headers_finished":
-            disposition, options = parse_options_header(content_disposition)
+            _disposition, options = parse_options_header(content_disposition)
             field_name = options[b"name"].decode("utf-8")
             field_value = b""
             if b"filename" in options:

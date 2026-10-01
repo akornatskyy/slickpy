@@ -4,17 +4,16 @@ from slickpy.application import App
 from slickpy.typing import AnyAsyncCallable
 
 
-class MethodAdapter(object):
-
+class MethodAdapter:
     def __init__(self, app: App):
         self.app = app
 
     def get(
         self,
         pattern: str,
-    ) -> typing.Callable[[typing.Union[AnyAsyncCallable, typing.Any]], None]:
+    ) -> typing.Callable[[AnyAsyncCallable | typing.Any], None]:
         def decorator(
-            handler: typing.Union[AnyAsyncCallable, typing.Any],
+            handler: AnyAsyncCallable | typing.Any,
         ) -> None:
             self.app.add_route(pattern, handler)
 
@@ -23,9 +22,9 @@ class MethodAdapter(object):
     def post(
         self,
         pattern: str,
-    ) -> typing.Callable[[typing.Union[AnyAsyncCallable, typing.Any]], None]:
+    ) -> typing.Callable[[AnyAsyncCallable | typing.Any], None]:
         def decorator(
-            handler: typing.Union[AnyAsyncCallable, typing.Any],
+            handler: AnyAsyncCallable | typing.Any,
         ) -> None:
             self.app.add_route(pattern, handler, methods=("POST",))
 

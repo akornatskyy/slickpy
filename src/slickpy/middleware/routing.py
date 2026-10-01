@@ -2,7 +2,7 @@ from slickpy.router import Router
 from slickpy.typing import ASGICallable, Receive, Scope, Send
 
 
-class RoutingMiddleware(object):
+class RoutingMiddleware:
     def __init__(self, router: Router, lifespan: ASGICallable):
         self.exact_matches = router.exact_matches
         self.regex_matches = router.regex_matches

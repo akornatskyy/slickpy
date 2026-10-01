@@ -14,15 +14,19 @@ body_chunks = [
     b"some text\r\n",
     b"-----123\r\n",
     b"Content-Disposition: form-data; ",
-    b'name="secret-foo"; filename="foo.txt"\r\n'
-    b"Content-Type: text/plain\r\n\r\n"
-    b"(content of ",
+    (
+        b'name="secret-foo"; filename="foo.txt"\r\n'
+        b"Content-Type: text/plain\r\n\r\n"
+        b"(content of "
+    ),
     b"the uploaded file foo.txt)\r\n",
     b"-----123\r\n",
     b"Content-Disposition: form-data; ",
-    b'name="secret-boo"; filename="boo.txt"\r\n'
-    b"Content-Type: text/html\r\n\r\n"
-    b"(content of ",
+    (
+        b'name="secret-boo"; filename="boo.txt"\r\n'
+        b"Content-Type: text/html\r\n\r\n"
+        b"(content of "
+    ),
     b"the uploaded file boo.txt)\r\n" * 40000,
     b"-----123--",
 ]

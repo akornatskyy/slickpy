@@ -1,5 +1,3 @@
-import typing
-
 from slickpy.adapters import signature_adapters
 from slickpy.application import App
 from slickpy.experimental.json import json_response, json_signatures
@@ -14,12 +12,12 @@ http = MethodAdapter(app)
 
 
 @http.get("/")
-async def hi() -> typing.Dict:
+async def hi() -> dict:
     return {"Hello": "World"}
 
 
 @http.get("/req")
-async def hi_req(req: Request) -> typing.Dict:
+async def hi_req(req: Request) -> dict:
     return {"Hello": "World"}
 
 

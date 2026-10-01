@@ -13,7 +13,7 @@ from slickpy.typing import (
 )
 
 
-class App(object):
+class App:
     def __init__(self) -> None:
         self.router = Router()
         self.lifespan = Lifespan()

@@ -16,7 +16,7 @@ def make_etag(body: bytes) -> bytes:
     return f'W/"{length:x}-{code}"'.encode("latin1")
 
 
-class Writer(object):
+class Writer:
     __slots__ = ("_send", "headers", "headersSent")
 
     def __init__(self, send: Send):
@@ -61,8 +61,8 @@ class Writer(object):
         await self._send({"type": "http.response.body", "body": chunk})
 
 
-class Response(object):
-    __slots__ = ("status_code", "headers", "body")
+class Response:
+    __slots__ = ("body", "headers", "status_code")
     status_code: int
     headers: Headers
     body: bytes
@@ -100,14 +100,14 @@ class Response(object):
 
 
 class BinaryResponse(Response):
-    __slots__ = ("status_code", "headers", "body")
+    __slots__ = ("body", "headers", "status_code")
 
     def __init__(
         self,
         body: bytes,
         status_code: int = 200,
         *,
-        headers: typing.Optional[Headers] = None,
+        headers: Headers | None = None,
         content_type: bytes = b"application/octet-stream",
     ):
         self.status_code = status_code
@@ -125,14 +125,14 @@ class BinaryResponse(Response):
 
 
 class TextResponse(Response):
-    __slots__ = ("status_code", "headers", "body")
+    __slots__ = ("body", "headers", "status_code")
 
     def __init__(
         self,
         content: str,
         status_code: int = 200,
         *,
-        headers: typing.Optional[Headers] = None,
+        headers: Headers | None = None,
         mime_type: str = "text/html",
         charset: str = "utf-8",
     ):
@@ -151,14 +151,14 @@ class TextResponse(Response):
 
 
 class JSONResponse(Response):
-    __slots__ = ("status_code", "headers", "body")
+    __slots__ = ("body", "headers", "status_code")
 
     def __init__(
         self,
         obj: typing.Any,
         status_code: int = 200,
         *,
-        headers: typing.Optional[Headers] = None,
+        headers: Headers | None = None,
     ):
         self.status_code = status_code
         body = json_dumps(

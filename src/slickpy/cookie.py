@@ -1,4 +1,3 @@
-import typing
 from http.cookies import _quote
 from time import gmtime, strftime
 
@@ -15,8 +14,8 @@ def set_cookie(  # noqa: CFQ002
     secure: bool = False,
     http_only: bool = False,
     same_site: str = "",
-) -> typing.Tuple[bytes, bytes]:
-    directives: typing.List[str] = []
+) -> tuple[bytes, bytes]:
+    directives: list[str] = []
     append = directives.append
     append(name + "=")
     if value:
@@ -43,8 +42,8 @@ def set_cookie(  # noqa: CFQ002
 
 def del_cookie(
     name: str, path: str = "", domain: str = ""
-) -> typing.Tuple[bytes, bytes]:
-    directives: typing.List[str] = []
+) -> tuple[bytes, bytes]:
+    directives: list[str] = []
     append = directives.append
     append(name + "=")
     if path:

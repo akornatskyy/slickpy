@@ -18,7 +18,7 @@ from slickpy.typing import (
     Send,
 )
 
-asgi_adapters: typing.List[ASGIAdapter] = []
+asgi_adapters: list[ASGIAdapter] = []
 
 
 def register_asgi_adapter(fn: ASGIAdapter) -> None:
@@ -65,14 +65,10 @@ def no_req_adapter(handler: NoReqCallable) -> ASGICallable:
     return asgi
 
 
-signature_adapters: typing.List[
-    typing.Tuple[inspect.Signature, ASGIAdapter]
-] = []
+signature_adapters: list[tuple[inspect.Signature, ASGIAdapter]] = []
 
 
-def strict_stream_signatures() -> (
-    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
-):
+def strict_stream_signatures() -> list[tuple[inspect.Signature, ASGIAdapter]]:
     async def direct(scope: Scope, receive: Receive, send: Send) -> None:
         pass  # pragma: nocover
 
@@ -90,7 +86,7 @@ def strict_stream_signatures() -> (
 
 
 def strict_req_resp_signatures() -> (
-    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
+    list[tuple[inspect.Signature, ASGIAdapter]]
 ):
     async def req_text(req: Request) -> TextResponse:
         pass  # pragma: nocover
@@ -112,9 +108,7 @@ def strict_req_resp_signatures() -> (
     ]
 
 
-def strict_resp_signatures() -> (
-    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
-):
+def strict_resp_signatures() -> list[tuple[inspect.Signature, ASGIAdapter]]:
     async def text() -> TextResponse:
         pass  # pragma: nocover
 
@@ -135,9 +129,7 @@ def strict_resp_signatures() -> (
     ]
 
 
-def strict_signatures() -> (
-    typing.List[typing.Tuple[inspect.Signature, ASGIAdapter]]
-):
+def strict_signatures() -> list[tuple[inspect.Signature, ASGIAdapter]]:
     return (
         strict_stream_signatures()
         + strict_req_resp_signatures()
@@ -150,7 +142,7 @@ signature_adapters.extend(strict_signatures())
 
 def handler_adapter_by_signature(
     handler: AnyAsyncCallable,
-) -> typing.Optional[ASGICallable]:
+) -> ASGICallable | None:
     s = inspect.signature(handler)
     for signature, asgi_adapter in signature_adapters:
         if signature == s:
