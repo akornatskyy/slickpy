@@ -7,7 +7,7 @@ name = "slickpy"
 dynamic = ["version"]
 description = "A lightweight ASGI toolkit, optimized for great performance, flexibility and productivity."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MIT"
 authors = [{ name = "Andriy Kornatskyy", email = "andriy.kornatskyy@live.com" }]
 keywords = ["ASGI", "http", "web", "toolkit"]
@@ -18,7 +18,6 @@ classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
